@@ -1,0 +1,9 @@
+Account Activation
+
+Hi {{ user.username }},
+
+Thank you for registering an account. Please copy and paste the link below into your web browser to activate your account:
+
+{{ site.scheme }}://{{ site.domain }}{{ url }}
+
+If you didn't register for an account, please ignore this email.
