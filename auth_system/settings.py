@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,10 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'rest_framework',
-    'djoser'
-]
+    'djoser',
+    'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
+         ]
 
 MIDDLEWARE = [
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,7 +70,12 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES':('JWT')
+    'AUTH_HEADER_TYPES':('JWT'),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    'AUTH_TOKEN_CLASSES':(
+        'rest_framework_simplejwt.tokens.AccessToken',
+    )
 }
 
 TEMPLATES = [
@@ -79,6 +89,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect'
             ],
         },
     },
@@ -103,6 +115,9 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -130,6 +145,16 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '470483217565-vgrteh06nsr32mkl3l7u8gidp7kv8t5b.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['https://www.googleapis/com/auth/userinfo.email','https://www.googleapis/com/auth/userinfo.profile','openid'] 
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA=['first_name','last_name']
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -168,10 +193,13 @@ DJOSER = {
     'USERNAME_REST_CONFIRM_URL':'EMAIL/reset/comfirm/{uid}/{token}',
     'ACTIVATION_URL':'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL':True,
+    'SOCIAL_AUTH_TOKEN_STRATEGY':'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS':['http://localhost:8000/complete/google-oauth2/'],
     'SERIALIZERS':{
         'user_create':'accounts.serializers.UserCreateSerializer',
          'user':'accounts.serializers.UserCreateSerializer',
          'user_delete':'djoser.serializers.UserCreateSerializer',
+         'current_user':'accounts.serializers.UserCreateSerializer'
      },
     'EMAIL': {
         'activation': 'djoser.email.ActivationEmail',
