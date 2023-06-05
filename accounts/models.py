@@ -13,10 +13,22 @@ class UserAccountManager(BaseUserManager):
         
         user.save()
 
+        return user
+
+    def create_superuser(self, email,password=None,**extra_fields):
+        if not email:
+            raise ValueError('users must have email address')
+        
+        email = self.normalize_email(email)
+        user = self.model(email=email,**extra_fields)
+        user.set_password(password)
+        
+        user.save()
+
         return user  
     
 
-class UserAccount(AbstractBaseUser, PermissionsMixin):
+class UserAccountModel(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255,default=None)
