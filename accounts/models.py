@@ -83,3 +83,19 @@ class BrandModel(models.Model):
 
     def __str__(self):
         return f"{self.brand_name} (User ID: {self.user_id})"
+
+# This is the model for the address
+# There can be only one address for either influencer or brand (One-to-One relationship)
+class AddressModel(models.Model):
+    # Address can either be for an influencer or a brand
+    influencer = models.OneToOneField(InfluencerModel, on_delete=models.CASCADE, null=True, blank=True)
+    brand = models.OneToOneField(BrandModel, on_delete=models.CASCADE, null=True, blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    address_line1 = models.CharField(max_length=400)
+    address_line2 = models.CharField(max_length=400, blank=True)
+    postal_code = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.influencer or self.brand} - Address"
